@@ -14,3 +14,4 @@ def stream_users():
 
     cursor.close()
     connection.close()
+
