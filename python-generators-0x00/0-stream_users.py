@@ -1,22 +1,16 @@
-# 1-batch_processing.py
+# 0-stream_users.py
 import seed
 
-def stream_users_in_batches(batch_size):
+def stream_users():
     connection = seed.connect_to_prodev()
     cursor = connection.cursor(dictionary=True)
     cursor.execute("SELECT * FROM user_data")
-    
+
     while True:
-        batch = cursor.fetchmany(batch_size)
-        if not batch:
+        row = cursor.fetchone()
+        if row is None:
             break
-        yield batch
+        yield row
 
     cursor.close()
     connection.close()
-
-def batch_processing(batch_size):
-    for batch in stream_users_in_batches(batch_size):
-        for user in batch:
-            if user['age'] > 25:
-                print(user)
