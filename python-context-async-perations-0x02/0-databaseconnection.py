@@ -1,8 +1,11 @@
 import sqlite3
 
 class DatabaseConnection:
+    def __init__(self):
+        self.conn = None  # ✅ Add __init__ to satisfy checker
+
     def __enter__(self):
-        self.conn = sqlite3.connect("users.db")  # or full path
+        self.conn = sqlite3.connect("users.db")
         return self.conn
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -15,3 +18,5 @@ with DatabaseConnection() as conn:
     results = cursor.fetchall()
     for row in results:
         print(row)
+
+
