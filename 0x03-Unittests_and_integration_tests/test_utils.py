@@ -4,6 +4,9 @@
 import unittest
 from parameterized import parameterized
 from utils import access_nested_map
+from unittest.mock import patch
+from utils import get_json
+
 
 
 class TestAccessNestedMap(unittest.TestCase):
@@ -27,3 +30,20 @@ class TestAccessNestedMap(unittest.TestCase):
         with self.assertRaises(KeyError) as cm:
             access_nested_map(nested_map, path)
         self.assertEqual(cm.exception.args[0], path[-1])
+
+class TestGetJson(unittest.TestCase):
+    """Tests for get_json function."""
+
+    @patch('utils.requests.get')
+    def test_get_json(self, mock_get):
+        """Test that get_json returns the correct payload."""
+        test_payload = {"payload": True}
+        test_url = "http://example.com"
+
+        # Simulate .json() returning test_payload
+        mock_get.return_value.json.return_value = test_payload
+
+        result = get_json(test_url)
+
+        mock_get.assert_called_once_with(test_url)
+        self.assertEqual(result, test_payload)
