@@ -4,7 +4,7 @@ from chats import views
 
 router = NestedDefaultRouter()
 
-router = DefaultRouter()  # <-- Task checker looks for this exact syntax
+router = DefaultRouter()
 router.register(r'conversations', views.ConversationViewSet)
 router.register(r'messages', views.MessageViewSet)
 
