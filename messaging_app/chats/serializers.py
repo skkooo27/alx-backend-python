@@ -26,6 +26,11 @@ class MessageSerializer(serializers.ModelSerializer):
     def get_sender_name(self, obj):
         return obj.sender.first_name + ' ' + obj.sender.last_name
 
+    def validate_message_body(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Message body cannot be empty.")
+        return value
+
 
 # 3. Conversation Serializer
 class ConversationSerializer(serializers.ModelSerializer):
