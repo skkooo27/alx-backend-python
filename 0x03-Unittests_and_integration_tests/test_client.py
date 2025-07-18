@@ -86,8 +86,8 @@ class TestGithubOrgClient(unittest.TestCase):
 
 @parameterized_class([
     {
-        "org_payload": TEST_PAYLOAD[0][0],   # First item in first tuple
-        "repos_payload": TEST_PAYLOAD[0][1], # Second item in first tuple
+        "org_payload": TEST_PAYLOAD[0][0],    # First item in first tuple
+        "repos_payload": TEST_PAYLOAD[0][1],  # Second item in first tuple
         "expected_repos": [repo["name"] for repo in TEST_PAYLOAD[0][1]],
         "apache2_repos": [
             repo["name"]
@@ -108,52 +108,7 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         mock_get.return_value.json.side_effect = [
             cls.org_payload,
             cls.repos_payload,
-            cls.org_payload,     
-            cls.repos_payload,  
-        ]
-
-    @classmethod
-    def tearDownClass(cls):
-        """Stop patcher after tests."""
-        cls.get_patcher.stop()
-
-    def test_public_repos(self):
-        """Test public_repos method returns expected repos."""
-        client = GithubOrgClient("test_org")
-        result = client.public_repos()
-        self.assertEqual(result, self.expected_repos)
-
-    def test_public_repos_with_license(self):
-        """Test public_repos with license filtering."""
-        client = GithubOrgClient("test_org")
-        result = client.public_repos(license="apache-2.0")
-        self.assertEqual(result, self.apache2_repos)
-
-@parameterized_class([
-    {
-        "org_payload": TEST_PAYLOAD[0][0],
-        "repos_payload": TEST_PAYLOAD[0][1],
-        "expected_repos": [repo["name"] for repo in TEST_PAYLOAD[0][1]],
-        "apache2_repos": [
-            repo["name"]
-            for repo in TEST_PAYLOAD[0][1]
-            if (repo.get("license") or {}).get("key") == "apache-2.0"
-        ],
-    }
-])
-class TestIntegrationGithubOrgClient(unittest.TestCase):
-    """Integration tests for GithubOrgClient.public_repos."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Start patcher for requests.get using fixtures."""
-        cls.get_patcher = patch('requests.get')
-        mock_get = cls.get_patcher.start()
-
-        mock_get.return_value.json.side_effect = [
             cls.org_payload,
-            cls.repos_payload,
-            cls.org_payload,       # 2nd test needs responses too
             cls.repos_payload,
         ]
 
