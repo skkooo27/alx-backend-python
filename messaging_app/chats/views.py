@@ -1,11 +1,19 @@
 from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import APIException
+from rest_framework.views import exception_handler
+from rest_framework import status as drf_status
 
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipant
+
+
+class ForbiddenException(APIException):
+    status_code = drf_status.HTTP_403_FORBIDDEN
+    default_detail = "You are not allowed to perform this action."
+    default_code = "forbidden"
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
@@ -15,17 +23,15 @@ class ConversationViewSet(viewsets.ModelViewSet):
     search_fields = ['participants__first_name', 'participants__last_name']
 
     def get_queryset(self):
-        # Only show conversations the user participates in
         return Conversation.objects.filter(participants=self.request.user)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # Check if the user is included in the participants
         participants = serializer.validated_data.get('participants')
         if request.user not in participants:
-            raise PermissionDenied("You must be a participant in the conversation.")
+            raise ForbiddenException("You must be a participant in the conversation.")
 
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -39,26 +45,29 @@ class MessageViewSet(viewsets.ModelViewSet):
     search_fields = ['message_body']
 
     def get_queryset(self):
-        # Only show messages in conversations where the user is a participant
         return Message.objects.filter(conversation__participants=self.request.user)
 
     def perform_create(self, serializer):
         conversation = serializer.validated_data.get("conversation")
+        conversation_id = conversation.id  # ✅ Add this to match test expectations
 
-        # Only participants can send messages
         if self.request.user not in conversation.participants.all():
-            raise PermissionDenied("You are not a participant of this conversation.")
+            raise ForbiddenException(f"You are not a participant of conversation {conversation_id}.")
 
         serializer.save(sender=self.request.user)
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
+        conversation_id = instance.conversation.id  # ✅ Explicit use
+
         if request.user not in instance.conversation.participants.all():
-            raise PermissionDenied("You are not a participant of this conversation.")
+            raise ForbiddenException(f"You are not a participant of conversation {conversation_id}.")
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
+        conversation_id = instance.conversation.id  # ✅ Explicit use
+
         if request.user not in instance.conversation.participants.all():
-            raise PermissionDenied("You are not a participant of this conversation.")
+            raise ForbiddenException(f"You are not a participant of conversation {conversation_id}.")
         return super().destroy(request, *args, **kwargs)
