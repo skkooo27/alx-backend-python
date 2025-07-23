@@ -10,6 +10,7 @@ from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipant
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import MessageFilter
+from .pagination import MessagePagination
 
 
 class ForbiddenException(APIException):
