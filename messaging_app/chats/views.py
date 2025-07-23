@@ -2,13 +2,13 @@ from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import APIException
-from rest_framework.views import exception_handler
 from rest_framework import status as drf_status
+
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
 from .permissions import IsParticipant
-from django_filters.rest_framework import DjangoFilterBackend
 from .filters import MessageFilter
 from .pagination import MessagePagination
 
@@ -42,7 +42,6 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
-    queryset = Message.objects.all()
     serializer_class = MessageSerializer
     permission_classes = [IsAuthenticated, IsParticipant]
     pagination_class = MessagePagination
@@ -56,25 +55,18 @@ class MessageViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         conversation = serializer.validated_data.get("conversation")
-        conversation_id = conversation.id  # ✅ Add this to match test expectations
-
         if self.request.user not in conversation.participants.all():
-            raise ForbiddenException(f"You are not a participant of conversation {conversation_id}.")
-
+            raise ForbiddenException(f"You are not a participant of conversation {conversation.id}.")
         serializer.save(sender=self.request.user)
 
     def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        conversation_id = instance.conversation.id  # ✅ Explicit use
-
-        if request.user not in instance.conversation.participants.all():
-            raise ForbiddenException(f"You are not a participant of conversation {conversation_id}.")
+        message = self.get_object()
+        if request.user not in message.conversation.participants.all():
+            raise ForbiddenException(f"You are not a participant of conversation {message.conversation.id}.")
         return super().update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        conversation_id = instance.conversation.id  # ✅ Explicit use
-
-        if request.user not in instance.conversation.participants.all():
-            raise ForbiddenException(f"You are not a participant of conversation {conversation_id}.")
+        message = self.get_object()
+        if request.user not in message.conversation.participants.all():
+            raise ForbiddenException(f"You are not a participant of conversation {message.conversation.id}.")
         return super().destroy(request, *args, **kwargs)
