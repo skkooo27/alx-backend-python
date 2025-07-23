@@ -44,3 +44,13 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_messages(self, obj):
         messages = obj.conversation_messages.all()
         return MessageSerializer(messages, many=True).data
+        
+class ConversationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Conversation
+        fields = ['id', 'participants', 'created_at']
+
+    def validate_participants(self, value):
+        if len(value) < 2:
+            raise serializers.ValidationError("A conversation must have at least 2 participants.")
+        return value
