@@ -32,23 +32,11 @@ class MessageSerializer(serializers.ModelSerializer):
         return value
 
 
-# 3. Conversation Serializer
-class ConversationSerializer(serializers.ModelSerializer):
-    participants = UserSerializer(many=True, read_only=True)
-    messages = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Conversation
-        fields = ['conversation_id', 'participants', 'created_at', 'messages']
-
-    def get_messages(self, obj):
-        messages = obj.conversation_messages.all()
-        return MessageSerializer(messages, many=True).data
-        
+# ✅ 3. Cleaned-Up Conversation Serializer (for creation + listing)
 class ConversationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
-        fields = ['id', 'participants', 'created_at']
+        fields = ['conversation_id', 'participants', 'created_at']
 
     def validate_participants(self, value):
         if len(value) < 2:

@@ -1,0 +1,103 @@
+{
+  "info": {
+    "name": "Messaging App API Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Login - Get JWT Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"ayeta@gmail.com\",\n  \"password\": \"ayeta9850\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/token/",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "token",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. Create Conversation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNTU4MTczLCJpYXQiOjE3NTM1NTc4NzMsImp0aSI6IjdkNzQ1Y2IxNWQ1ZjRkNjY5Y2QxMWY3NTRhMTBlNjA2IiwidXNlcl9pZCI6ImY2NTkwN2UyLTE1OTQtNGExZi1iMGIwLWYwYmUzMDkwMGUyMyJ9.7r-UH5Qm4LMx7WiLjCLoMuqvkRQzNRsjTNg89lhAnvI"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"participants\": [\n    \"f65907e2-1594-4a1f-b0b0-f0be30900e23\",\n    \"d62b7a42-0960-4b49-bd79-68809005062a\"\n  ]\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/conversations/",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "conversations",
+            ""
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. Send Message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzUzNTU4MTczLCJpYXQiOjE3NTM1NTc4NzMsImp0aSI6IjdkNzQ1Y2IxNWQ1ZjRkNjY5Y2QxMWY3NTRhMTBlNjA2IiwidXNlcl9pZCI6ImY2NTkwN2UyLTE1OTQtNGExZi1iMGIwLWYwYmUzMDkwMGUyMyJ9.7r-UH5Qm4LMx7WiLjCLoMuqvkRQzNRsjTNg89lhAnvI"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"conversation\": \"e7c61ae2-a159-469d-a2d7-a31a2cc9b5bb\",\n  \"message_body\": \"Hello from Postman collection!\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/messages/",
+          "protocol": "http",
+          "host": [
+            "127.0.0.1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "messages",
+            ""
+          ]
+        }
+      }
+    }
+  ]
+}

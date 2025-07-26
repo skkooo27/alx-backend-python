@@ -20,6 +20,7 @@ class ForbiddenException(APIException):
 
 
 class ConversationViewSet(viewsets.ModelViewSet):
+    queryset = Conversation.objects.all()  # ✅ Required by DRF
     serializer_class = ConversationSerializer
     permission_classes = [IsAuthenticated, IsParticipant]
     filter_backends = [filters.SearchFilter]
@@ -42,13 +43,13 @@ class ConversationViewSet(viewsets.ModelViewSet):
 
 
 class MessageViewSet(viewsets.ModelViewSet):
+    queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [IsAuthenticated, IsParticipant]
-    pagination_class = MessagePagination
+    permission_classes = [IsAuthenticated]
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['sender__username', 'content']
+    ordering_fields = ['timestamp']
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_class = MessageFilter
-    search_fields = ['message_body']
 
     def get_queryset(self):
         return Message.objects.filter(conversation__participants=self.request.user)
