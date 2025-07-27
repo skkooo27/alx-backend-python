@@ -1,0 +1,4 @@
+2025-07-27 20:30:12 - GET /api/rooms/
+2025-07-27 20:31:45 - POST /api/messages/
+2025-07-27 20:32:10 - PUT /api/users/f65907e2-1594-4a1f-b0b0-f0be30900e23/
+2025-07-27 20:33:55 - DELETE /api/messages/10/
