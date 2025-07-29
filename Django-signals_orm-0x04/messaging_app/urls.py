@@ -19,4 +19,5 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("messages/<int:message_id>/history/", message_history_view, name="message_history"),
 ]
