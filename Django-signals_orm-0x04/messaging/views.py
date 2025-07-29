@@ -25,18 +25,35 @@ def delete_user(request):
         user.delete()
         return redirect('login')
 
+@login_required
 def get_conversation(request):
-    # Top-level messages only
-    messages = Message.objects.filter(parent_message__isnull=True).select_related('sender').prefetch_related('replies__sender')
+    messages = Message.unread_objects.for_user(request.user).filter(
+        parent_message__isnull=True
+    ).select_related('sender').prefetch_related('replies__sender').only(
+        'id', 'content', 'sender', 'timestamp', 'parent_message'
+    )
 
     def get_threaded_replies(message):
-        """ Recursively get all replies for a message. """
-        replies = Message.objects.filter(parent_message=message).select_related('sender')
-        for reply in replies:
-            reply.threaded_replies = get_threaded_replies(reply)
-        return replies
+        replies = Message.objects.filter(
+            parent_message=message, read=False, receiver=request.user
+        ).select_related('sender').only('id', 'content', 'sender', 'timestamp', 'parent_message')
+        
+        return [
+            {
+                'id': reply.id,
+                'sender': reply.sender.username,
+                'content': reply.content,
+                'replies': get_threaded_replies(reply)
+            } for reply in replies
+        ]
 
-    for message in messages:
-        message.threaded_replies = get_threaded_replies(message)
+    data = [
+        {
+            'id': message.id,
+            'sender': message.sender.username,
+            'content': message.content,
+            'replies': get_threaded_replies(message)
+        } for message in messages
+    ]
 
-    return render(request, 'chat/conversation.html', {'messages': messages})
+    return JsonResponse({'messages': data})
