@@ -1,5 +1,7 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from .models import Message, MessageHistory
 
 def message_history_view(request, message_id):
@@ -16,3 +18,10 @@ def message_history_view(request, message_id):
     ]
 
     return JsonResponse(data, safe=False)
+
+@login_required
+def delete_user(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete()
+        return redirect('login') 
