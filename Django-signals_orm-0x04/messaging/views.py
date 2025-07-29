@@ -85,3 +85,19 @@ def unread_messages_view(request):
         })
 
     return JsonResponse({'unread_messages': messages_data})
+
+
+@cache_page(60)  # Cache this view for 60 seconds
+def conversation_messages_view(request, conversation_id):
+    messages = Message.objects.filter(conversation_id=conversation_id).order_by('-timestamp')
+    data = [
+        {
+            "id": message.id,
+            "sender": message.sender.username,
+            "receiver": message.receiver.username,
+            "content": message.content,
+            "timestamp": message.timestamp,
+        }
+        for message in messages
+    ]
+    return JsonResponse({"messages": data})

@@ -24,5 +24,6 @@ urlpatterns = [
     path('delete-account/', views.delete_user, name='delete_user'),
     path('messages/', views.get_conversation, name='get_conversation'),
     path('messages/unread/', views.unread_messages_view, name='unread_messages'),
+    path('conversation/<int:conversation_id>/messages/', conversation_messages_view, name='conversation_messages'),
 
 ]
