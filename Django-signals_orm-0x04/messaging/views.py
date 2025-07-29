@@ -1,8 +1,9 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from .models import Message, MessageHistory
+
 
 def message_history_view(request, message_id):
     message = get_object_or_404(Message, id=message_id)
@@ -18,6 +19,7 @@ def message_history_view(request, message_id):
 
     return JsonResponse(data, safe=False)
 
+
 @login_required
 def delete_user(request):
     if request.method == 'POST':
@@ -25,19 +27,26 @@ def delete_user(request):
         user.delete()
         return redirect('login')
 
+
 @login_required
 def get_conversation(request):
+    # Top-level unread messages
     messages = Message.unread_objects.for_user(request.user).filter(
         parent_message__isnull=True
     ).select_related('sender').prefetch_related('replies__sender').only(
         'id', 'content', 'sender', 'timestamp', 'parent_message'
     )
 
+    # Recursive function to fetch threaded replies
     def get_threaded_replies(message):
         replies = Message.objects.filter(
-            parent_message=message, read=False, receiver=request.user
-        ).select_related('sender').only('id', 'content', 'sender', 'timestamp', 'parent_message')
-        
+            parent_message=message,
+            receiver=request.user,
+            read=False
+        ).select_related('sender').prefetch_related('replies__sender').only(
+            'id', 'content', 'sender', 'timestamp', 'parent_message'
+        )
+
         return [
             {
                 'id': reply.id,

@@ -1,11 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
-
-class UnreadMessagesManager(models.Manager):
-    def for_user(self, user):
-        return self.get_queryset().filter(receiver=user, read=False).only('id', 'sender', 'content', 'timestamp')
-
+from .managers import UnreadMessagesManager
 
 class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
@@ -13,17 +8,14 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # New fields for edit tracking
     edited = models.BooleanField(default=False)
     edited_at = models.DateTimeField(null=True, blank=True)
     edited_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='edited_messages'
     )
 
-    # New field for read status
     read = models.BooleanField(default=False)
 
-    # Self-referential field for threading
     parent_message = models.ForeignKey(
         'self',
         null=True,
@@ -32,8 +24,8 @@ class Message(models.Model):
         related_name='replies'
     )
 
-    objects = models.Manager()  # Default manager
-    unread_objects = UnreadMessagesManager()  # Custom manager
+    objects = models.Manager()
+    unread = UnreadMessagesManager() 
 
     def __str__(self):
         return f"Message from {self.sender.username} to {self.receiver.username}"
