@@ -25,3 +25,12 @@ def delete_user(request):
         user = request.user
         user.delete()
         return redirect('login') 
+
+def get_conversation(request):
+    messages = (
+        Message.objects
+        .filter(parent_message__isnull=True)
+        .select_related('sender')
+        .prefetch_related('replies__sender', 'replies__replies')  # preload nested replies
+    )
+    return render(request, 'chat/conversation.html', {'messages': messages})       

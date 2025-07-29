@@ -16,9 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from messaging.views import message_history_view
+from messaging.views import delete_user
+
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("messages/<int:message_id>/history/", message_history_view, name="message_history"),
     path('delete-account/', delete_user, name='delete_user'),
+    path('messages/<int:message_id>/history/', message_history_view, name='message_history'),
 ]

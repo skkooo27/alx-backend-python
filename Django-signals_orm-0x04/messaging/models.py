@@ -7,11 +7,20 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    # New fields
+    # New fields for edit tracking
     edited = models.BooleanField(default=False)
     edited_at = models.DateTimeField(null=True, blank=True)
     edited_by = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name='edited_messages'
+    )
+
+    # Self-referential field for threading
+    parent_message = models.ForeignKey(
+        'self',
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name='replies'
     )
 
     def __str__(self):
@@ -26,7 +35,6 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user} on message {self.message.id}"
 
-# New model
 class MessageHistory(models.Model):
     message = models.ForeignKey(Message, on_delete=models.CASCADE, related_name='history')
     old_content = models.TextField()
