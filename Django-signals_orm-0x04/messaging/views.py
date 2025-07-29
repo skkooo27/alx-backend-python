@@ -66,3 +66,22 @@ def get_conversation(request):
     ]
 
     return JsonResponse({'messages': data})
+
+@require_GET
+def unread_messages_view(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Authentication required'}, status=401)
+
+    unread_messages = Message.unread.unread_for_user(request.user)
+
+    messages_data = []
+    for message in unread_messages:
+        messages_data.append({
+            'id': message.id,
+            'sender': message.sender.username,
+            'subject': message.subject,
+            'body': message.body,
+            'timestamp': message.timestamp,
+        })
+
+    return JsonResponse({'unread_messages': messages_data})
