@@ -5,4 +5,7 @@ from .models import Message, Notification
 @receiver(post_save, sender=Message)
 def create_notification(sender, instance, created, **kwargs):
     if created:
-        Notification.objects.create(user=instance.receiver, message=instance)
+        Notification.objects.create(
+            message=instance,
+            to_user=instance.recipient
+        )
