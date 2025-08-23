@@ -4,14 +4,18 @@ Django>=4.2
 # Django REST framework for building APIs
 djangorestframework>=3.14
 
-# Database drivers (if using PostgreSQL)
-psycopg2-binary>=2.9
+# Database drivers
+mysqlclient>=2.1
 
 # For environment variables
 python-dotenv>=1.0
+django-environ>=0.10.0
 
 # CORS handling for APIs
 django-cors-headers>=4.0
+
+# For filtering APIs
+django-filter>=23.0
 
 # For password hashing and security
 bcrypt>=4.0
@@ -25,5 +29,3 @@ drf-yasg>=1.21
 
 # Requests library for external HTTP requests
 requests>=2.31
-
-

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os 
 
 SIMPLE_JWT = {
     'USER_ID_FIELD': 'user_id',  # 👈 IMPORTANT: match your custom user primary key
@@ -90,11 +91,14 @@ WSGI_APPLICATION = 'messaging_app.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('MYSQL_DATABASE'),
+        'USER': os.environ.get('MYSQL_USER'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+        'HOST': os.environ.get('MYSQL_HOST', 'db'),  # service name in docker-compose
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
