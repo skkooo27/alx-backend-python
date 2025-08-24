@@ -1,0 +1,24 @@
+#!/bin/bash
+
+DEPLOYMENT="messaging-app-blue"
+
+echo "🔄 Applying rolling update..."
+kubectl apply -f blue_deployment.yaml
+
+echo "📈 Monitoring rollout status..."
+kubectl rollout status deployment/$DEPLOYMENT
+
+# Get service URL from Minikube
+SERVICE_URL=$(minikube service messaging-app-service --url | head -n1)
+
+echo "⚡ Testing app availability with curl..."
+# Continuously send requests for 20 seconds
+end=$((SECONDS+20))
+while [ $SECONDS -lt $end ]; do
+  curl -s $SERVICE_URL > /dev/null
+  echo "Request sent to $SERVICE_URL"
+  sleep 2
+done
+
+echo "✅ Current pods after rolling update:"
+kubectl get pods -l app=messaging-app,version=blue
