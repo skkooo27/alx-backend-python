@@ -26,5 +26,22 @@ pipeline {
                 junit 'report.xml'
             }
         }
+        stage('Build Docker Image') {
+            steps {
+                // Build Docker image from Dockerfile in messaging_app directory
+                sh 'docker build -t skkooo27/messaging-app:latest messaging_app'
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                // Use Docker Hub credentials stored in Jenkins
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                        docker push skkooo27/messaging-app:latest
+                    '''
+                }
+            }
+        }
     }
 }
