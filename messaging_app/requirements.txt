@@ -29,3 +29,5 @@ drf-yasg>=1.21
 
 # Requests library for external HTTP requests
 requests>=2.31
+
+parameterized>=0.9.0
