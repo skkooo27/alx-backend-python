@@ -1,0 +1,17 @@
+#!/bin/bash
+DEPLOYMENT_NAME="messaging-app-deployment"
+
+echo "📦 Scaling $DEPLOYMENT_NAME to 3 replicas..."
+kubectl scale deployment $DEPLOYMENT_NAME --replicas=3
+
+echo "🔍 Verifying running pods..."
+kubectl get pods -l app=messaging-app
+
+echo "⚡ Running load test with wrk..."
+# Assuming your app is exposed internally at port 8000
+# Replace SERVICE_IP if needed: minikube service messaging-app-service --url
+SERVICE_IP=$(minikube service messaging-app-service --url | head -n 1)
+wrk -t2 -c10 -d30s $SERVICE_IP
+
+echo "📊 Monitoring resource usage..."
+kubectl top pods
